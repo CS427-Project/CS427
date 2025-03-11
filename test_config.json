@@ -1,0 +1,10 @@
+{
+    "cfg": "cfg_re50",
+    "resize": 1,
+    "confidence_threshold": 0.02,
+    "top_k": 5000,
+    "keep_top_k": 750,
+    "nms_threshold": 0.4,
+    "save_image": true,
+    "vis_thres": 0.6
+}
