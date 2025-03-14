@@ -174,3 +174,4 @@ cython_debug/
 data/widerface/
 Retinaface_model_v2/
 weights/
+data/fairface/
