@@ -39,7 +39,8 @@ rgb_mean = (104, 117, 123) # bgr order
 num_classes = 2
 img_dim = cfg['image_size']
 num_gpu = cfg['ngpu']
-batch_size = cfg['batch_size']
+# batch_size = cfg['batch_size']
+batch_size = 12
 max_epoch = cfg['epoch']
 gpu_train = cfg['gpu_train']
 
