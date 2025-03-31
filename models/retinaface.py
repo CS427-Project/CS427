@@ -69,6 +69,9 @@ class RetinaFace(nn.Module):
             import torchvision.models as models
             backbone = models.resnet50(pretrained=cfg['pretrain'])
 
+        # Freezing of backbone parameters to not retrain ResNet stuffs
+        # for param in backbone.parameters():
+        #     param.requires_grad = False
         self.body = _utils.IntermediateLayerGetter(backbone, cfg['return_layers'])
         in_channels_stage2 = cfg['in_channel']
         in_channels_list = [
