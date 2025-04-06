@@ -80,26 +80,25 @@ def get_gt_boxes_from_txt(gt_path, cache_dir):
 
 
 def read_pred_file(filepath):
-
     with open(filepath, 'r') as f:
         lines = f.readlines()
         img_file = lines[0].rstrip('\n\r')
         lines = lines[2:]
 
-    # b = lines[0].rstrip('\r\n').split(' ')[:-1]
-    # c = float(b)
-    # a = map(lambda x: [[float(a[0]), float(a[1]), float(a[2]), float(a[3]), float(a[4])] for a in x.rstrip('\r\n').split(' ')], lines)
     boxes = []
     for line in lines:
         line = line.rstrip('\r\n').split(' ')
-        if line[0] is '':
+        if line[0] == '':
             continue
-        # a = float(line[4])
-        boxes.append([float(line[0]), float(line[1]), float(line[2]), float(line[3]), float(line[4])])
-    boxes = np.array(boxes)
-    # boxes = np.array(list(map(lambda x: [float(a) for a in x.rstrip('\r\n').split(' ')], lines))).astype('float')
-    return img_file.split('/')[-1], boxes
+        try:
+            # Attempt to convert all values to float and append them
+            boxes.append([float(line[0]), float(line[1]), float(line[2]), float(line[3]), float(line[4])])
+        except ValueError:
+            # Skip the line if there's a conversion error (e.g., 'author:' line)
+            continue
 
+    boxes = np.array(boxes)
+    return img_file.split('/')[-1], boxes
 
 def get_preds(pred_dir):
     events = os.listdir(pred_dir)
@@ -112,6 +111,11 @@ def get_preds(pred_dir):
         event_images = os.listdir(event_dir)
         current_event = dict()
         for imgtxt in event_images:
+            img_path = os.path.join(event_dir, imgtxt)
+
+            # Skip directories
+            if os.path.isdir(img_path):
+                continue
             imgname, _boxes = read_pred_file(os.path.join(event_dir, imgtxt))
             current_event[imgname.rstrip('.jpg')] = _boxes
         boxes[event] = current_event
@@ -149,6 +153,10 @@ def image_eval(pred, gt, ignore, iou_thresh):
     gt: Nx4
     ignore:
     """
+    # print(f"Pred: {pred}")
+    # print(f"GT: {gt}")
+    # print(f"Ignore: {ignore}")
+    # print(f"IOU: {iou_thresh}")
 
     _pred = pred.copy()
     _gt = gt.copy()
@@ -161,7 +169,10 @@ def image_eval(pred, gt, ignore, iou_thresh):
     _gt[:, 2] = _gt[:, 2] + _gt[:, 0]
     _gt[:, 3] = _gt[:, 3] + _gt[:, 1]
 
+    # print("Hello")
     overlaps = bbox_overlaps(_pred[:, :4], _gt)
+    # print("Hello1")
+    # print(f"Overlaps: {overlaps}")
 
     for h in range(_pred.shape[0]):
 
@@ -250,7 +261,9 @@ def evaluation(pred, gt_path, iou_thresh=0.5):
             gt_bbx_list = facebox_list[i][0]
 
             for j in range(len(img_list)):
+                # print(str(img_list[j][0][0]))
                 pred_info = pred_list[str(img_list[j][0][0])]
+                # print(pred_info)
 
                 gt_boxes = gt_bbx_list[j][0].astype('float')
                 keep_index = sub_gt_list[j][0]
@@ -261,7 +274,10 @@ def evaluation(pred, gt_path, iou_thresh=0.5):
                 ignore = np.zeros(gt_boxes.shape[0])
                 if len(keep_index) != 0:
                     ignore[keep_index-1] = 1
+                # print("Here")
                 pred_recall, proposal_list = image_eval(pred_info, gt_boxes, ignore, iou_thresh)
+                # print("Here1")
+                # print(pred_recall, proposal_list)
 
                 _img_pr_info = img_pr_info(thresh_num, pred_info, proposal_list, pred_recall)
 
@@ -289,7 +305,6 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
     evaluation(args.pred, args.gt)
-
 
 
 

@@ -170,3 +170,5 @@ def detect_face(img_path, model_weights_path, output_img_path, test_config_json)
             cv2.circle(img_raw, (b[13], b[14]), 1, (255, 0, 0), 4)
         # save image
         cv2.imwrite(output_img_path, img_raw)
+
+    return dets

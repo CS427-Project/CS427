@@ -9,7 +9,7 @@ cimport cython
 import numpy as np
 cimport numpy as np
 
-DTYPE = np.float
+DTYPE = float
 ctypedef np.float_t DTYPE_t
 
 def bbox_overlaps(
@@ -24,6 +24,7 @@ def bbox_overlaps(
     -------
     overlaps: (N, K) ndarray of overlap between boxes and query_boxes
     """
+    # print("Called")
     cdef unsigned int N = boxes.shape[0]
     cdef unsigned int K = query_boxes.shape[0]
     cdef np.ndarray[DTYPE_t, ndim=2] overlaps = np.zeros((N, K), dtype=DTYPE)
